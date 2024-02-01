@@ -7,6 +7,19 @@ import TaskDetails from './TaskDetails';       // Importing TaskDetails componen
 import TaskForm from './TaskForm';             // Importing TaskForm component
 import '/Users/sannatvats/Desktop/Intern/task-manager/src/index.css';  // Importing CSS file
 
+// Default demo tasks
+const defaultTasks: TaskProps[] = [
+    {
+      id: 1,
+      title: 'Demo Task 1',
+      description: 'This is a demo task with a description.',
+      dueDate: '2024-02-15',
+      priority: 'high',
+      completed: false,
+    },
+    // ... other tasks
+  ];
+
 // Define the TaskList functional component
 const TaskList: React.FC = () => {
   // State variables to manage tasks, filtered tasks, selected task, and task form visibility
@@ -16,13 +29,26 @@ const TaskList: React.FC = () => {
   const [showTaskForm, setShowTaskForm] = useState(false);
 
   // useEffect to load tasks from localStorage on component mount
-  useEffect(() => {
+useEffect(() => {
+    // Load tasks from local storage on component mount
     const storedTasks = localStorage.getItem('tasks');
+  
     if (storedTasks) {
       setTasks(JSON.parse(storedTasks));
+    } else {
+      // If no tasks are stored, set the default tasks
+      setTasks((prevTasks) => {
+        // Check if tasks already exist to prevent overriding
+        if (prevTasks.length === 0) {
+          return defaultTasks;
+        }
+        return prevTasks;
+      });
     }
-  }, []);
+  }, []); // Empty dependency array to run the effect only on mount
+  
 
+  
   // useEffect to update localStorage when tasks change
   useEffect(() => {
     localStorage.setItem('tasks', JSON.stringify(tasks));
@@ -46,6 +72,7 @@ const TaskList: React.FC = () => {
 
   // Handler for sorting tasks based on a key
   const handleSort = (key: keyof TaskProps) => {
+    //console.log(`Sorting by ${key}`);
     const sortedTasks = [...filteredTasks].sort((a, b) =>
       a[key] > b[key] ? 1 : b[key] > a[key] ? -1 : 0
     );
@@ -61,11 +88,13 @@ const TaskList: React.FC = () => {
   };
 
   // Handler for adding a new task
-  const handleAddTask = (newTask: Omit<TaskProps, 'id'>) => {
-    setTasks((prevTasks) => [...prevTasks, { ...newTask, id: Date.now(), completed: false }]);
+    const handleAddTask = (newTask: Omit<TaskProps, 'id'>) => {
+    const updatedTasks = [...tasks, { ...newTask, id: Date.now(), completed: false }];
+    console.log('Updated tasks before storing:', updatedTasks);
+    setTasks(updatedTasks);
     setShowTaskForm(false);
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
   };
-
   // Handler for editing an existing task
   const handleEditTask = (editedTask: Omit<TaskProps, 'id'>) => {
     setTasks((prevTasks) =>
@@ -83,13 +112,13 @@ const TaskList: React.FC = () => {
   // Handler for drag-and-drop end
   const handleDragEnd = (result: DropResult) => {
     console.log('Drag End Result:', result);
-  
+
     if (!result.destination) return; // Dropped outside the list
-  
+
     const reorderedTasks = Array.from(filteredTasks);
     const [movedTask] = reorderedTasks.splice(result.source.index, 1);
     reorderedTasks.splice(result.destination.index, 0, movedTask);
-  
+
     setFilteredTasks(reorderedTasks);
   };
 
@@ -142,7 +171,7 @@ const TaskList: React.FC = () => {
                         <td>{task.description}</td>
                         <td>{task.dueDate}</td>
                         <td>{task.priority}</td>
-                        
+
                         {/* Action buttons for editing and deleting tasks */}
                         <td>
                           <button onClick={() => setShowTaskForm(true)}>Edit</button>

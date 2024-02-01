@@ -80,6 +80,7 @@ th {
   color: white;
   padding: 12px;
   text-align: left;
+  cursor: pointer;
 }
 
 /* Cell styling for different columns */
