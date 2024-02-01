@@ -19,7 +19,6 @@ const defaultTasks: TaskProps[] = [
     completed: false,
     reminderDate: '', // Added reminderDate
   },
-  // ... other tasks
 ];
 
 // Define the TaskList functional component
@@ -40,14 +39,14 @@ const TaskList: React.FC = () => {
     } else {
       // If no tasks are stored, set the default tasks
       setTasks((prevTasks) => {
-        // Check if tasks already exist to prevent overriding
+        
         if (prevTasks.length === 0) {
           return defaultTasks;
         }
         return prevTasks;
       });
     }
-  }, []); // Empty dependency array to run the effect only on mount
+  }, []); 
 
   // useEffect to update localStorage when tasks change
   useEffect(() => {
