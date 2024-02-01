@@ -4,6 +4,8 @@ import '/Users/sannatvats/Desktop/Intern/task-manager/src/index.css'; // Importi
 
 // Define the TaskProps interface to describe the expected properties
 export interface TaskProps {
+  reminderDate: string;
+  reminderTime: string;
   id: number;
   title: string;
   description: string;

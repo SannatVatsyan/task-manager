@@ -5,20 +5,22 @@ import '/Users/sannatvats/Desktop/Intern/task-manager/src/index.css'; // Importi
 
 // Define the TaskFormProps interface to describe the expected properties
 interface TaskFormProps {
-  onSubmit: (task: Omit<TaskProps, 'id'>) => void; // Function to handle form submission
+  onSubmit: (task: Omit<TaskProps, 'id'> & { reminderDate: string; reminderTime: string }) => void; // Function to handle form submission
   onCancel: () => void; // Function to handle form cancellation
   task?: TaskProps | null; // Optional task prop for pre-filling form in case of editing
 }
 
 // Define the TaskForm functional component
 const TaskForm: React.FC<TaskFormProps> = ({ onSubmit, onCancel, task }) => {
-  // State variable to manage form data
-  const [formData, setFormData] = useState<Omit<TaskProps, 'id'>>({
+  // State variables to manage form data and reminder date
+  const [formData, setFormData] = useState<Omit<TaskProps, 'id'> & { reminderDate: string; reminderTime: string }>({
     title: '',
     description: '',
     dueDate: '',
     priority: 'low',
     completed: false,
+    reminderDate: '', // Adding reminderDate to the initial state
+    reminderTime: '', // Adding reminderTime to the initial state
   });
 
   // useEffect to set form data when the task prop changes
@@ -30,6 +32,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit, onCancel, task }) => {
         dueDate: task.dueDate,
         priority: task.priority,
         completed: task.completed,
+        reminderDate: task.reminderDate || '', // Setting a default value for reminderDate
+        reminderTime: task.reminderTime || '', // Setting a default value for reminderTime
       });
     }
   }, [task]);
@@ -40,9 +44,21 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit, onCancel, task }) => {
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
+  // Event handler for reminder date input changes
+  const handleReminderDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prevData) => ({ ...prevData, reminderDate: e.target.value }));
+  };
+
+  // Event handler for reminder time input changes
+  const handleReminderTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prevData) => ({ ...prevData, reminderTime: e.target.value }));
+  };
+
   // Event handler for form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Pass both formData, reminderDate, and reminderTime to the onSubmit function
     onSubmit({ ...formData });
   };
 
@@ -65,6 +81,18 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit, onCancel, task }) => {
       <label>
         Due Date:
         <input type="date" name="dueDate" value={formData.dueDate} onChange={handleChange} required />
+      </label>
+
+      {/* Input field for reminder date */}
+      <label>
+        Reminder Date:
+        <input type="date" name="reminderDate" value={formData.reminderDate} onChange={handleReminderDateChange} />
+      </label>
+
+      {/* Input field for reminder time */}
+      <label>
+        Reminder Time:
+        <input type="time" name="reminderTime" value={formData.reminderTime} onChange={handleReminderTimeChange} />
       </label>
 
       {/* Dropdown for task priority */}
